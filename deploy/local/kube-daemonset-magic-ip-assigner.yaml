@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: magic-ip-assigner
+  labels:
+    app: magic-ip-assigner
+spec:
+  selector:
+    matchLabels:
+       app: magic-ip-assigner
+  template:
+    metadata:
+      name: magic-ip-assigner
+      labels:
+        app: magic-ip-assigner
+    spec:
+      hostNetwork: true
+      containers:
+        - name: magic-ip-assigner
+          image: mumoshu/kube-magic-ip-assigner:0.9.1-1.9.8
+          securityContext:
+            privileged: true
+            capabilities:
+              add: [NET_ADMIN]
+          env:
+          - name: PORT
+            value: "80"
+          - name: TARGET
+            value: "80"
+          - name: SELECTOR
+            value: "app=fake-ec2-metadata-service"
+          - name: PROTOCOL
+            value: tcp
+          - name: MAGIC_IP
+            value: 169.254.169.254
+          - name: HOST_INTERFACE
+            value: docker0
+          - name: VERBOSE
+            value: "1"
+          - name: NAMESPACE
+            value: "kube-system"
+          - name: NODE_NAME
+            value: "minikube"

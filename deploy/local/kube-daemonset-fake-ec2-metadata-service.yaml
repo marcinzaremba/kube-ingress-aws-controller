@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fake-ec2-metadata-service
+  labels:
+    app: fake-ec2-metadata-service
+spec:
+  selector:
+    matchLabels:
+      app: fake-ec2-metadata-service
+  template:
+    metadata:
+      name: fake-ec2-metadata-service
+      labels:
+        app: fake-ec2-metadata-service
+    spec:
+      volumes:
+        - name: aws-config
+          hostPath:
+            path: /aws-config
+      containers:
+        - name: fake-ec2-metadata-service
+          image: bpholt/fake-ec2-metadata-service:latest
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          env:
+          - name: BIND_ADDR
+            value: 0.0.0.0
+          - name: LOCAL_ADDR
+            value: 172.28.159.34
+          volumeMounts:
+          - mountPath: /opt/aws
+            readOnly: true
+            name: aws-config
